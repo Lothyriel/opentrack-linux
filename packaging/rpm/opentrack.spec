@@ -7,6 +7,7 @@ License:        GPL-3.0-or-later
 URL:            https://github.com/opentrack/opentrack
 Source0:        %{name}-%{version}.tar.gz
 
+BuildRequires:  git
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
