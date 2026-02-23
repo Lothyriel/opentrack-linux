@@ -9,7 +9,9 @@ RUN dnf -y update && dnf -y install \
   cmake make gcc-c++ \
   rpm-build rpmdevtools \
   qt6-qtbase-devel qt6-qttools-devel qt6-qtbase-private-devel \
-  opencv-devel procps-ng-devel \
+  opencv-devel onnxruntime-devel \
+  wine wine-devel \
+  procps-ng-devel \
   tar gzip findutils \
   && dnf clean all
 

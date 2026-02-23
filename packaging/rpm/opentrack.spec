@@ -11,12 +11,15 @@ BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  opencv-devel
+BuildRequires:  onnxruntime-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qttools-devel
 BuildRequires:  qt6-qtbase-private-devel
+BuildRequires:  wine-devel
 
 Requires:       opencv
+Requires:       onnxruntime
 Requires:       procps-ng
 Requires:       qt6-qtbase
 Requires:       qt6-qttools
@@ -31,7 +34,9 @@ opentrack is a head tracking application that relays head movement to games/sims
 %cmake \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=%{_prefix} \
-  -DCMAKE_INSTALL_LIBDIR=%{_lib}
+  -DCMAKE_INSTALL_LIBDIR=%{_lib} \
+  -DSDK_WINE=ON \
+  -DOPENTRACK_WINE_ARCH=-m64
 %cmake_build
 
 %install
