@@ -28,7 +28,10 @@ opentrack is a head tracking application that relays head movement to games/sims
 %autosetup -n opentrack
 
 %build
-%cmake -DCMAKE_BUILD_TYPE=Release
+%cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+  -DCMAKE_INSTALL_LIBDIR=%{_lib}
 %cmake_build
 
 %install
