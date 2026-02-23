@@ -1,5 +1,5 @@
 Name:           opentrack
-Version:        %{?opentrack_version: %{opentrack_version}}%{!?opentrack_version: 0.0}
+Version:        %{?opentrack_version:%{opentrack_version}}%{!?opentrack_version:0.0}
 Release:        1%{?dist}
 Summary:        Head tracking software
 
@@ -39,9 +39,12 @@ opentrack is a head tracking application that relays head movement to games/sims
 
 %files
 %license OPENTRACK-LICENSING.txt
-%doc README*
+%doc %{_docdir}/opentrack/
+
+# main binary (keep this if it exists; see note below)
 %{_bindir}/opentrack
-%{_libdir}/opentrack/*.so
+%{_datadir}/opentrack/
+%{_libexecdir}/opentrack/
 
 %changelog
 * Mon Feb 23 2026 Container Builder <builder@local> - %{version}-1
