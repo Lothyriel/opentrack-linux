@@ -1,5 +1,5 @@
 Name:           opentrack
-Version:        %{?opentrack_version:%{opentrack_version}}%{!?opentrack_version:0.0}
+Version:        %{opentrack_version}
 Release:        1%{?dist}
 Summary:        Head tracking software
 
