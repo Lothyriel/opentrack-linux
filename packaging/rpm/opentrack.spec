@@ -35,12 +35,10 @@ opentrack is a head tracking application that relays head movement to games/sims
 %cmake_install
 
 %files
-%license LICENSE*
+%license OPENTRACK-LICENSING.txt
 %doc README*
 %{_bindir}/opentrack
 %{_libdir}/opentrack/*.so
-%{_datadir}/applications/*.desktop
-%{_datadir}/icons/hicolor/*/apps/*
 
 %changelog
 * Mon Feb 23 2026 Container Builder <builder@local> - %{version}-1
