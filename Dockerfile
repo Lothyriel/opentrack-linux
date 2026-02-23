@@ -1,5 +1,7 @@
 FROM fedora:43
 
+LABEL org.opencontainers.image.source="https://github.com/lothyriel/opentrack-linux"
+
 RUN dnf -y update && dnf -y install \
   --setopt=install_weak_deps=0 \
   --setopt=tsflags=nodocs \
