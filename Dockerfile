@@ -1,0 +1,18 @@
+FROM fedora:43
+
+RUN dnf -y update && dnf -y install \
+  --setopt=install_weak_deps=0 \
+  --setopt=tsflags=nodocs \
+  git ca-certificates \
+  cmake make gcc-c++ \
+  rpm-build rpmdevtools \
+  qt6-qtbase-devel qt6-qttools-devel qt6-qtbase-private-devel \
+  opencv-devel procps-ng-devel \
+  tar gzip findutils \
+  && dnf clean all
+
+WORKDIR /work
+COPY build-rpm.sh /work/build-rpm.sh
+RUN chmod +x /work/build-rpm.sh
+
+CMD ["/work/build-rpm.sh"]
