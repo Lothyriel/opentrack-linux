@@ -1,0 +1,85 @@
+name: Build RPM and Publish to COPR
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: copr-publish-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/lothyriel/opentrack-linux/opentrack-rpm-builder:fedora43
+
+    steps:
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Compute build version from current repository state
+        shell: bash
+        run: |
+          set -euo pipefail
+          short_sha="$(git -C opentrack rev-parse --short HEAD)"
+          build_date="$(date -u +%Y.%m.%d)"
+          echo "OPENTRACK_VERSION=${build_date}.git${short_sha}" >> "$GITHUB_ENV"
+
+      - name: Build RPMs/SRPM from current state
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /spec /opentrack /out || true
+          mkdir -p /spec /out
+          cp -v packaging/rpm/opentrack.spec /spec/opentrack.spec
+          ln -s "$GITHUB_WORKSPACE/opentrack" /opentrack
+          OPENTRACK_VERSION="$OPENTRACK_VERSION" ./build-rpm.sh
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm-build-output
+          path: /out/*
+          if-no-files-found: error
+
+      - name: Install COPR client
+        shell: bash
+        run: |
+          set -euo pipefail
+          dnf -y install copr-cli
+
+      - name: Configure COPR credentials
+        shell: bash
+        env:
+          COPR_CONFIG: ${{ secrets.COPR_CONFIG }}
+        run: |
+          set -euo pipefail
+          [[ -n "${COPR_CONFIG:-}" ]] || { echo "Missing required secret: COPR_CONFIG"; exit 1; }
+          mkdir -p ~/.config
+          printf '%s\n' "$COPR_CONFIG" > ~/.config/copr
+          chmod 600 ~/.config/copr
+
+      - name: Submit SRPM build to COPR
+        shell: bash
+        env:
+          COPR_PROJECT: ${{ secrets.COPR_PROJECT }}
+          COPR_CHROOT: ${{ secrets.COPR_CHROOT }}
+        run: |
+          set -euo pipefail
+          [[ -n "${COPR_PROJECT:-}" ]] || { echo "Missing required secret: COPR_PROJECT"; exit 1; }
+          srpm="$(ls -1 /out/*.src.rpm | head -n1)"
+          if [[ -n "${COPR_CHROOT:-}" ]]; then
+            copr-cli build --nowait --chroot "$COPR_CHROOT" "$COPR_PROJECT" "$srpm"
+          else
+            copr-cli build --nowait "$COPR_PROJECT" "$srpm"
+          fi
